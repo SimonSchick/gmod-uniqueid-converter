@@ -108,7 +108,7 @@ uint32_t crc32(uint32_t crc, const void *buf, size_t size)
 }
 
 #define bruteforce(format)\
-for(int i = 0;i<0xFFFFFFFF;i++) {\
+for(int i = 0;i<0x7FFFFFFF;i++) {\
 	int len = sprintf(fmtBuffer, format, i);\
 	if(i % 0xFFFF == 0) {\
 		printf("%i\n", i);\
