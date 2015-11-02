@@ -107,29 +107,37 @@ uint32_t crc32(uint32_t crc, const void *buf, size_t size)
 	return crc ^ ~0U;
 }
 
-#define bruteforce(format)\
-for(int i = 0;i<0x7FFFFFFF;i++) {\
-	int len = sprintf(fmtBuffer, format, i);\
-	if(i % 0xFFFF == 0) {\
-		printf("%i\n", i);\
-	}\
-	if(crc32(0, fmtBuffer, len) == in) {\
-		printf("Found collision: %s", fmtBuffer);\
-		_getch();\
-		return 0;\
-	}\
-}\
+char[] formats = [
+	"gm_STEAM_0:0:%i_gm",
+	"gm_STEAM_0:1:%i_gm",
+	"gm_STEAM_1:0:%i_gm",
+	"gm_STEAM_1:1:%i_gm"
+];
+
+bool findCollission(int uniqueId, char* outBuffer) {
+	for(int k = 0;k < sizeof(formats)/sizeof(char*);k++) {
+		const char* format = formats[k];
+		for(int i = 0;i<0x7FFFFFFF;i++) {
+			int len = sprintf(outBuffer, format, i);
+			if(crc32(0, outBuffer, len) == in) {
+				return true;
+			}
+		}	
+	}
+	return false;
+}
 
 int main(int argc, char* argv[])
 {
 	int in;
 	char fmtBuffer[64];
 	scanf("%i", &in);
-
-	bruteforce("gm_STEAM_0:0:%i_gm");
-	bruteforce("gm_STEAM_0:1:%i_gm");
-	bruteforce("gm_STEAM_1:0:%i_gm");
-	bruteforce("gm_STEAM_1:1:%i_gm");
+	
+	if(findCollission(in, fmtBuffer)) {
+		printf("Found id: %s\n", fmtBuffer);
+	} else {
+		puts("Nothing found\n");
+	}
 
 	return 0;
 }
